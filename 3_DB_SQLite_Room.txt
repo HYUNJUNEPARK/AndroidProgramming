@@ -1,0 +1,68 @@
+[SQLite] : CRUD 가 가능한 Todo List
+
+SQLite를 사용하기 위한 2가지 방법
+1) createDatabae() 메서드 사용
+2) SQLiteOpenHelper 클래스 상속받아 사용
+-> 2) 방법으로 SQLite 사용
+
+데이터베이스를 파일로 생성하고 코틀린 코드에서 사용할 수 있도록 데이터베이스와 연결하는 역할
+ex) val helper = SQLiteHelper(context, "테이블명", 버전정보)
+
+onCreate() : 테이블 생성 쿼리를 정의하고 실행할 수 있으며 테이블이 생성되어 있다면 실행되지 않음
+- 특별한 이유가 없다면 SQLite 에서 INTEGER 로 선언한 컬럼은 데이터 클래스에서 Long 으로 사용함
+onUpgrade() : SQLiteHelper 에 전달되는 버전 정보가 변경되었을 때 현재 생성되어 있는 DB 버전보다 높으면 호출됨. 버전 변경 사항이 없으면 호출되지 않음
+
+ContentValues() : put("컬럼명", 값) 메서드로 데이터 저장
+writableDatabase : 삽입(쓰기) 전용 DB. 사용 후 close 호출
+-insert("테이블명", null, 저장할 값)
+-update("테이블명", 수정할 값, 수정조건(PRIMARY KEY), 3번째 파라미터에 매핑할 값)
+readableDatabase : 읽기(조회) 전용 DB. 사용 후 close 호출
+-rawQuery()
+
+커서(cursor) : 쿼리를 통해 반환된 데이터셋을 반복문으로 하나씩 처리 할 수 있음
+
+insertMemo(), updateMemo() 는 RecyclerAdapter 를 한번 비우고 전체 내용을 다시 갱신해 추가 수정된 내용을 UI 에 업로드
+-helper?.updateMemo(memo)
+-listData.clear()
+-listData.addAll(helper!!.selectMemo())
+-notifyDataSetChanged()
+
+deleteMemo() 는 데이터 삭제 후 바로 UI 수정 가능
+-helper?.deleteMemo(mMemo!!)
+-listData.remove(mMemo)
+-notifyDataSetChanged()
+_____________________________________________________________________________________________________________________
+[Room: ORM 라이브러리] ORM : Object Relational Mapping
+
+쿼리문 이해가 없어도 코드만으로 class 와 RDB 를 매핑하고 컨트롤 할 수 있음.
+class -> ORM(데이터 변환을 도와줌) -> SQLite
+앱수준 build.gradle 에 1) id 'kotlin-kapt' plugin 2) dependency 추가
+See: https://developer.android.com/jetpack/androidx/releases/room
+
+어노테이션 프로세싱(Annotation Processing API)
+클래스명, 변수명 위에 '@명령어' 를 사용하는 것으로 명령어가 컴파일 시 코드로 생성되기 때문에 실행 시 발생할 수 있는 성능 문제가 많이 개선됨
+plugin id 'kotlin-kapt' : 어노테이션 프로세싱을 코트린에서 사용 가능하게 해줌
+
+RoomTable : DB 테이블의 정보를 담고 있는 클래스
+-@Entity(tableName = "") : 해당 어노테이션이 적용된 클래스를 찾아 테이블로 변환
+-@ColumnInfo(name = "") : 컬럼에 대한 정보를 담고 있는 변수위에 사용됨
+-@Ignore : 해당 변수가 테이블과 관계없는 변수라는 것을 나타냄
+-@PrimaryKey(autoGenerate = true)
+
+RoomDao : DB 에 접근 해 쿼리를 실행하는 메서드를 모아둔 인터페이스
+-@RoomDao : DAO 라는 것을 명시(Data Access Object)
+-@Query : 쿼리를 직접 작성하고 실행
+-@Insert, @Delete
+
+RoomHelper : RoomDatabase() 를 상속받는 추상 클래스로 RoomDao 를 상속받는 추상 메서드가 내부에 있음
+RoomTable, RoomDao 의 정보가 모여 있는 빈껍데기 클래스로 최종적으로 Room 라이브러리를 통해 미리 만들어져 있는 코드를 사용할 수 있게 됨
+-@Database(entities= , version= , exportSchema=)
+-entities : Room 라이브러리가 사용할 테이블 클래스 목록 ex. entities = arrayOf(RoomTable::class)
+-version : DB 버전
+-exportSchema : true 면 스키마 정보를 파일로 출력
+
+Migration 클래스 : DB 수정
+앱 업데이트가 DB 테이블을 변경할 때 이미 기기 내 데이터베이스에 있는 사용자 데이터를 유지하는 것이 중요함
+Room 라이브러리는 Migration 클래스를 지원해 유저의 데이터를 유지함
+See : https://developer.android.com/training/data-storage/room/migrating-db-versions?hl=ko
+

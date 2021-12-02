@@ -1,0 +1,53 @@
+1. 리눅스 파일 시스템 특징
+설치된 앱 하나당 리눅스 사용자 아이디와 그에 해당하는 디렉터리가 할당되며 이 디렉터리에는 해당 사용자만 접근할 수 있음
+2. 내부 저장소 : 설치된 앱에 제공되는 디렉터리로, 해당 앱은 이 디렉터리에 한해서만 권한 없이 읽기/쓰기 가능
+3. 외부 저장소 : 모든 앱이 함께 사용하는 공간으로 외부 저장소 디렉터리의 권한 허가가 필요함
+4. 미디어스토어 : 외부 저장소에 저장되는 파일을 관리하는 DB 또는 앱의 개념
+5. 버퍼 : 읽기/쓰기가 가능한 메모리 배열로 1) 데이터 타입에 따라 구분 2) 버퍼가 사용하는 메모리 위치에 따라 구분
+__________________________________________________________________
+[File IO] : File 클래스의 메서드 설명과 스트림 API 샘플
+
+File() 클래스에 디렉터리를 매개변수로 전달한 후 사용
+isFile() :  File 의 생성자에 전달된 경로가 '파일'인지 확인
+isDirectory() : File 의 생성자에 전달된 경로가 '디텍터리'인지 확인
+exists() : 파일 존재 여부 확인. if 문과 함께 사용
+createNewFile() : 해당 디렉터리에 파일이 존재 하지 않으면 파일을 생성. exists()와 함께 사용
+mkdirs() : 중간 디렉터리가 없다면 중간 디렉터리도 생성. exists()와 함께 사용
+
+FileWriter() : 쓰기 스트림으로 디렉터리를 생성 ex)/data/user/0/com.example.fileio/files/NewFile.txt
+FileReader() : 읽기 스트림으로 읽어올 데이터의 경로를 갖고 있음
+BufferedWriter() : 쓰기 스트림을 매개변수로 받아 버퍼를 생성해 저장 속도를 향상 시킴
+BufferedReader() : 읽기 스트림을 매개변수로 받아 버퍼를 생성해 읽기 속도를 향상 시킴
+사용이 끝난 버퍼는 닫아 메모리 누수를 최소화 시켜줘야함
+
+참고 : openFileInput() 메서드를 사용하면 더 짧은 코드로 텍스트 파일을 읽을 수 있음
+var contents = ""
+context.openFileInput("파일 경로").bufferedReader().useLines { lines ->
+      contents = lines.joinToString("\n")
+}
+__________________________________________________________________
+[SharedPreferences]
+
+앱 설정 등 내부 저장소에 간단한 데이터를 저장. 데이터를 key: value 쌍으로 XML 파일에 저장하며 앱이 종료되어도 남아있음
+preferences.xml 에서 값을 조절하면 설정값이 자동으로 지정된 SharedPreferences 파일에 저장됨
+저장된 설정값은 PreferenceManager.getDefaultSharedPreferences() 으로 호출해서 사용할 수 있음
+
+SharedPreferences 생성
+앱 수준 build.gradle 에 dependency 추가
+[res] 우클릭-[New]-[Android Resource File]-> Resource type : XML / Root element : PreferenceScreen / File name : preferences
+
+SettingFragment.kt : PreferenceFragmentCompat() 를 상속 받은 클래스
+onCreatePreferences() 를 오버라이드해 addPreferencesFromResource() 에 R.xml.preferences 를 파라미터로 전달하면 설정 항목에 대한 View 를 자동생성
+activity_main.xml 에 <fragment> 속성을 드래그 한 후 SettingFragment 를 추가해서 사용
+
+앱 설정 UI 샘플 preferences.xml 에서 사용하는 입력필드 종류
+a. CheckBoxPreference : 체크박스 타입 입력 필드
+b. SwitchPreference : 스위치(ON/OFF) 타입 입력 필드
+c. EditTextPreference : 값을 입력하는 타입 입력 필드
+d. ListPreference : 목록형 입력 필드 / 띄울 목록과 값은 아래처럼 사용
+- array.xml : ListPreference 에서 사용할 아이템을 저장해둔 xml 파일
+<ListPreference
+...
+android:entries="@array/action_list"
+android:entryValues="@array/action_values"
+.../>

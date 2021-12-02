@@ -1,0 +1,27 @@
+[CameraAndGallery]
+AndroidManifest 에 카메라 접근 권한과 외부 저장소 읽기, 쓰기 권한 추가
+
+URI(Uniform Resource Identifier) : 특정 리소스 자원을 고유하게 식별할 수 있는 식별자
+MediaStore : 안드로이드 외부 저장소를 관리하는 일종의 DB
+
+setViews()
+-앱 시작 시 외부 저장소 권한을(val PERM_STORAGE = 99) 요청하고 승인 되었을 때 호출되며 '카메라', '갤러리' 버튼을 UI에 배치
+-카메라 버튼 : 카메라 권한이(val PERM_CAMERA = 100) 승인 되었을 때 fun openCamera() 호출
+-갤러리 버튼 : fun openGallery() 호출
+
+openCamera()
+-카메라 권한이 (val PERM_CAMERA = 100) 승인 되었을 때 카메라앱을 실행
+-카메라 촬영이 있다면 이미지 Uri 를 생성해 외부 저장소에 저장하고 onActivityResult() 로 requestCode(REQ_CAMERA = 101) 와 사진 데이터를 보냄
+-파일의 Uri 를 생성하는 createImageUri() 와 파일 이름을 생성하는 newFileName() 이 실행해 이미지 Uri 를 생성하고 문제가 없다면 uri 데이터를 realUri 에 담는다
+
+createImageUri()
+-파라미터로 파일이름과 데이터 형식(MIME_TYPE)을 받아 Uri 를 생성
+
+openGallery()
+-Intent.ACTION_PICK 을 사용해 intent.type 에서 지정한 데이터 형식과 같은 데이터를 MediaStore 에서 불러와 갤러리 앱 실행
+-갤러리에서 이미지를 선택하면 인텐트와 requestCode(REQ_STORAGE) 를 보내고 onActivityResult 에서 처리
+
+loadBitmap()
+-카메라로 이미지를 촬영하고 UI 를 세팅하면 사진의 프리뷰가 넘어와 이미지가 깨질 수 있음
+-파라미터로 넘어온 uri 에 해당되는 이미지를 비트맵 형식으로 바꿔줌
+
