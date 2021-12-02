@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.june.activity.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-
     val binding by lazy {ActivityMainBinding.inflate(layoutInflater)}
 
     //startActivityForResult() 가 deprecated 되었기 때문에 ActivityResultLauncher 사용
