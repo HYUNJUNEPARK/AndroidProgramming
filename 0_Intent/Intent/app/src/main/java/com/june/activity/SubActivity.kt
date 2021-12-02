@@ -6,7 +6,6 @@ import android.os.Bundle
 import com.june.activity.databinding.ActivitySubBinding
 
 class SubActivity : AppCompatActivity() {
-
     val binding by lazy { ActivitySubBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
