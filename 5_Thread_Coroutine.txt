@@ -45,6 +45,7 @@ class WorkerThread : Thread() {
 }
 var thread = WorkerThread()
 thread.start()
+
 2)Runnable 인터페이스 구현
 -Thread 를 상속받은 객체와 달리 Thead 클래스의 생성자로 전달하고 Thread 클래스의 start() 메서드를 호출해야 스레드가 생성됨
 class WorkerRunnable : Runnable {
@@ -54,6 +55,7 @@ class WorkerRunnable : Runnable {
 }
 var thread = Thread(WorkerRunnable())
 thread.start()
+
 3)thread()
 thread(start=true){
     ...
